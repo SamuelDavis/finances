@@ -6,8 +6,28 @@
         "build": "vite build"
     },
     "devDependencies": {
+        "@prettier/plugin-php": "^0.22.2",
+        "@shufo/prettier-plugin-blade": "^1.13.4",
         "axios": "^1.6.4",
         "laravel-vite-plugin": "^1.0.0",
+        "prettier": "^3.2.5",
         "vite": "^5.0.0"
+    },
+    "prettier": {
+        "plugins": [
+            "@prettier/plugin-php",
+            "@shufo/prettier-plugin-blade"
+        ],
+        "overrides": [
+            {
+                "files": [
+                    "*.blade.php"
+                ],
+                "options": {
+                    "parser": "blade",
+                    "tabWidth": 4
+                }
+            }
+        ]
     }
 }

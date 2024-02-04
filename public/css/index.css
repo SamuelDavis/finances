@@ -1,0 +1,18 @@
+:root {
+    font-family: Figtree, serif;
+}
+
+.hx-indicator,
+.htmx-swapping {
+    opacity: 0;
+    transition: opacity 500ms ease-in-out;
+}
+
+.htmx-request .hx-indicator,
+.htmx-request.hx-indicator {
+    opacity: 1;
+}
+
+form [role="alert"] {
+    color: var(--del-color);
+}
