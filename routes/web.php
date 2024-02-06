@@ -24,8 +24,15 @@ use Symfony\Component\HttpFoundation\Response as BaseResponse;
 */
 
 Route::get("/", function () {
-    return view("upload");
+    return redirect("upload");
 })->name("index");
+
+Route::get("/upload", function () {
+    if (Session::get("current") instanceof Csv) {
+        return redirect("headers");
+    }
+    return view("upload");
+})->name("upload");
 
 Route::post("/upload", function () {
     $input = Request::all();
@@ -45,12 +52,35 @@ Route::post("/upload", function () {
     $file = $validator->validated()["file"];
     $csv = Csv::fromUploadedFile($file);
     Session::put("current", $csv);
-    return view("headers", compact("csv"));
+
+    $headers = $csv->getHeaders();
+    $response = new Response(view("headers", compact("headers")));
+
+    return $response->header("HX-Push-Url", route("headers"));
 })->name("upload");
+
+Route::get("/headers", function () {
+    /** @var Csv $csv */
+    $csv = Session::get("current");
+    if (!($csv instanceof Csv)) {
+        return redirect()->route("upload");
+    }
+
+    if ($csv->headersHaveBeenSet()) {
+        return redirect("table");
+    }
+
+    $headers = $csv->getHeaders();
+    return view("headers", compact("headers"));
+})->name("headers");
 
 Route::post("/headers", function () {
     /** @var Csv $csv */
     $csv = Session::get("current");
+    if (!($csv instanceof Csv)) {
+        return redirect()->route("upload");
+    }
+
     $input = Request::all();
     Session::flashInput($input);
     $validator = Validator::make($input, [
@@ -71,8 +101,9 @@ Route::post("/headers", function () {
 
     if ($validator->fails()) {
         $errors = $validator->errors();
+        $headers = $csv->getHeaders();
         return new Response(
-            view("headers", compact("errors", "csv")),
+            view("headers", compact("errors", "headers")),
             BaseResponse::HTTP_UNPROCESSABLE_ENTITY,
         );
     }
@@ -80,5 +111,19 @@ Route::post("/headers", function () {
     $csv->setHeaders($validator->getValue("headers"));
     $headers = $csv->getHeaders();
     $rows = collect($csv->getRows())->sortBy("date")->reverse()->toArray();
-    return view("table", compact("headers", "rows"));
+    $response = new Response(view("table", compact("headers", "rows")));
+    return $response->header("HX-Push-Url", route("table"));
 })->name("headers");
+
+Route::get("/table", function () {
+    /** @var Csv $csv */
+    $csv = Session::get("current");
+    if (!($csv instanceof Csv)) {
+        return redirect()->route("upload");
+    }
+
+    $headers = $csv->getHeaders();
+    $rows = collect($csv->getRows())->sortBy("date")->reverse()->toArray();
+    $response = new Response(view("table", compact("headers", "rows")));
+    return $response->header("HX-Push-Url", route("table"));
+})->name("table");

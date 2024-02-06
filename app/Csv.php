@@ -6,6 +6,7 @@ use DomainException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use UnitEnum;
 
 class Csv
 {
@@ -41,6 +42,17 @@ class Csv
     public function getRows(): array
     {
         return $this->rows ?? array_slice($this->data ?? [], 1);
+    }
+
+    public function headersHaveBeenSet(): bool
+    {
+        $enumHeaders = array_map(
+            fn(UnitEnum $case) => $case->name,
+            Headers::cases(),
+        );
+        $csvHeaders = $this->getHeaders();
+        $headerDiff = array_diff($enumHeaders, $csvHeaders);
+        return empty($headerDiff);
     }
 
     public function getHeaders(): array

@@ -1,8 +1,6 @@
 @php
-    use App\Csv;
     use App\Headers;
-    use Illuminate\Support\Str;
-    /** @var Csv $csv */
+    /** @var string[] $headers */
 @endphp
 @extends('layouts.default')
 @section('main')
@@ -11,8 +9,8 @@
             <div>
                 <label for="{{ $case->name }}">The {{ $case->name }} is in...</label>
                 <select name="headers[{{ $case->name }}]" id="{{ $case->name }}" required>
-                    @foreach ($csv->getHeaders() as $header)
-                        <option value="{{ $header }}" @if (old("headers.$case->name", Str::contains($header, $case->name, true))) selected="selected" @endif>
+                    @foreach ($headers as $header)
+                        <option value="{{ $header }}" @if (old("headers.$case->name") === $header) selected="selected" @endif>
                             ...the "{{ $header }}" column
                         </option>
                     @endforeach
