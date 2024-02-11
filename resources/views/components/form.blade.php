@@ -3,9 +3,9 @@
     /** @var Illuminate\Contracts\Support\MessageBag $errors */
     /** @var ComponentAttributeBag $attributes */
 @endphp
-<form {{ $attributes }} hx-swap="outerHTML swap:500ms" hx-indicator="progress" hx-encoding="multipart/form-data">
+@props(['submit' => 'Submit'])
+<form hx-encoding="multipart/form-data" hx-indicator="progress" {{ $attributes }}>
     @csrf
     {{ $slot }}
-    <input type="submit">
-    <progress class="hx-indicator"></progress>
+    <input type="submit" value="{{ $submit }}">
 </form>

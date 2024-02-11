@@ -2,14 +2,13 @@
     font-family: Figtree, serif;
 }
 
-.hx-indicator,
+progress,
 .htmx-swapping {
     opacity: 0;
     transition: opacity 500ms ease-in-out;
 }
 
-.htmx-request .hx-indicator,
-.htmx-request.hx-indicator {
+.htmx-request {
     opacity: 1;
 }
 
