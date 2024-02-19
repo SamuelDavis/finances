@@ -17,29 +17,29 @@ class CreateUploadController extends Controller
     public function __invoke(): BaseResponse
     {
         $validator = Validator::make(Request::all(), [
-            "file" => ["required", File::types("text/csv")],
+            'file' => ['required', File::types('text/csv')],
         ]);
-        View::share("errors", $validator->errors());
+        View::share('errors', $validator->errors());
 
         if ($validator->fails()) {
             throw new ValidationException(
                 $validator,
-                Response::view("upload.form")->setStatusCode(
+                Response::view('upload.form')->setStatusCode(
                     BaseResponse::HTTP_UNPROCESSABLE_ENTITY,
                 ),
             );
         }
 
         /** @var UploadedFile $file */
-        $file = $validator->getValue("file");
-        $stream = fopen($file->path(), "r");
+        $file = $validator->getValue('file');
+        $stream = fopen($file->path(), 'r');
         $data = [];
         while (($row = fgetcsv($stream)) !== false) {
             $data[] = $row;
         }
         fclose($stream);
-        Session::put("data", $data);
+        Session::put('data', $data);
 
-        return redirect("headers")->setStatusCode(BaseResponse::HTTP_SEE_OTHER);
+        return redirect('headers')->setStatusCode(BaseResponse::HTTP_SEE_OTHER);
     }
 }

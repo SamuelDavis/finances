@@ -10,7 +10,8 @@ class ReadHeadersController extends Controller
 {
     public function __invoke(): BaseResponse
     {
-        $headers = Session::get("data")[0] ?? [];
-        return Response::view("headers.page", compact("headers"));
+        $headers = Session::get('data')[0] ?? [];
+
+        return Response::view('headers.page', compact('headers'));
     }
 }

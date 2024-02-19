@@ -14,11 +14,11 @@ class SessionHasOrderedData
     /**
      * Handle an incoming request.
      *
-     * @param Closure(Request): (Response) $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $data = Session::get("data");
+        $data = Session::get('data');
         $givenHeaders = reset($data);
         $knownHeaders = Header::names();
         $isOrdered =
@@ -26,10 +26,10 @@ class SessionHasOrderedData
             empty(array_diff($givenHeaders, $knownHeaders)) &&
             empty(array_diff($knownHeaders, $givenHeaders));
 
-        Log::debug("isOrdered", [$isOrdered]);
+        Log::debug('isOrdered', [$isOrdered]);
 
         return $isOrdered
-            ? redirect("table", Response::HTTP_SEE_OTHER)
+            ? redirect('table', Response::HTTP_SEE_OTHER)
             : $next($request);
     }
 }

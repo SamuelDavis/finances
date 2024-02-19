@@ -11,19 +11,20 @@ class HxTransformer
     /**
      * Handle an incoming request.
      *
-     * @param Closure(Request): (Response) $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
-        if (!$request->header("Hx-Request")) {
+        if (! $request->header('Hx-Request')) {
             return $response;
         }
 
-        if ($location = $response->headers->get("Location")) {
-            $response->headers->set("Hx-Redirect", $location);
-            $response->headers->remove("Location");
+        if ($location = $response->headers->get('Location')) {
+            $response->headers->set('Hx-Redirect', $location);
+            $response->headers->remove('Location');
         }
+
         return $response;
     }
 }

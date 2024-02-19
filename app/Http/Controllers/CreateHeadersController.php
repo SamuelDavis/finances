@@ -16,38 +16,38 @@ class CreateHeadersController extends Controller
 {
     public function __invoke(ReadHeadersController $read): BaseResponse
     {
-        $data = Session::get("data");
+        $data = Session::get('data');
         $validator = Validator::make(Request::all(), [
-            "headers.*" => ["required", "distinct", new In(Header::names())],
+            'headers.*' => ['required', 'distinct', new In(Header::names())],
         ])->setAttributeNames(
             array_reduce(
                 Header::names(),
-                fn(array $acc, string $name) => ["headers.$name" => $name] +
+                fn (array $acc, string $name) => ["headers.$name" => $name] +
                     $acc,
                 [],
             ),
         );
 
         if ($validator->fails()) {
-            View::share("errors", $validator->errors());
+            View::share('errors', $validator->errors());
             Request::flash();
             $headers = $data[0] ?? [];
             throw new ValidationException(
                 $validator,
                 Response::view(
-                    "headers.form",
-                    compact("headers"),
+                    'headers.form',
+                    compact('headers'),
                     BaseResponse::HTTP_UNPROCESSABLE_ENTITY,
                 ),
             );
         }
 
         Session::put(
-            "data",
-            $this->mapDataToHeaders($validator->getValue("headers"), $data),
+            'data',
+            $this->mapDataToHeaders($validator->getValue('headers'), $data),
         );
 
-        return redirect("table", BaseResponse::HTTP_SEE_OTHER);
+        return redirect('table', BaseResponse::HTTP_SEE_OTHER);
     }
 
     private function mapDataToHeaders(array $inputHeaders, array $data): array
@@ -67,6 +67,7 @@ class CreateHeadersController extends Controller
         }, $data);
 
         array_unshift($data, $knownHeaders);
+
         return $data;
     }
 }

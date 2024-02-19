@@ -12,6 +12,6 @@ enum Header
 
     public static function names(): array
     {
-        return Arr::pluck(Header::cases(), "name");
+        return Arr::pluck(Header::cases(), 'name');
     }
 }

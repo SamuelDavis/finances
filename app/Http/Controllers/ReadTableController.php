@@ -10,13 +10,14 @@ class ReadTableController extends Controller
 {
     public function __invoke(): BaseResponse
     {
-        if (!Session::has("data")) {
-            return redirect("upload");
+        if (! Session::has('data')) {
+            return redirect('upload');
         }
 
-        $rows = Session::get("data");
+        $rows = Session::get('data');
         $headers = array_shift($rows);
-        return Response::view("table.page", compact("headers", "rows"));
+
+        return Response::view('table.page', compact('headers', 'rows'));
     }
     //
 }
