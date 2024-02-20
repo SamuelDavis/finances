@@ -13,37 +13,43 @@
 
 use App\Http\Controllers\CreateHeadersController;
 use App\Http\Controllers\CreateUploadController;
+use App\Http\Controllers\DeleteUploadController;
 use App\Http\Controllers\ReadHeadersController;
 use App\Http\Controllers\ReadTableController;
 use App\Http\Middleware\HxTransformer;
+use App\Http\Middleware\RequiresSessionData;
 use App\Http\Middleware\SessionHasOrderedData;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Session;
 
 // Home
-Route::get("/", fn() => redirect(route("upload")))->name("home");
+Route::get('/', fn () => redirect(route('upload')))->name('home');
 
 // Upload
-Route::get("/upload", fn() => view("upload.page"))
-    ->name("upload")
+Route::get('/upload', fn () => view('upload.page'))
+    ->name('upload')
     ->middleware([HxTransformer::class]);
-Route::post("/upload", CreateUploadController::class)
-    ->name("upload")
+Route::post('/upload', CreateUploadController::class)
+    ->name('upload')
     ->middleware([HxTransformer::class]);
-Route::delete("/upload", function () {
-    Session::remove("data");
-    return redirect(route("upload"));
-})
-    ->name("upload")
+Route::delete('/upload', DeleteUploadController::class)
+    ->name('upload')
     ->middleware([HxTransformer::class]);
 
 // Headers
-Route::get("/headers", ReadHeadersController::class)
-    ->name("headers")
-    ->middleware([HxTransformer::class, SessionHasOrderedData::class]);
-Route::post("/headers", CreateHeadersController::class)
-    ->name("headers")
-    ->middleware([HxTransformer::class, SessionHasOrderedData::class]);
+Route::get('/headers', ReadHeadersController::class)
+    ->name('headers')
+    ->middleware([HxTransformer::class,
+        RequiresSessionData::class,
+        SessionHasOrderedData::class]);
+Route::post('/headers', CreateHeadersController::class)
+    ->name('headers')
+    ->middleware([
+        HxTransformer::class,
+        RequiresSessionData::class,
+        SessionHasOrderedData::class,
+    ]);
 
 // Table
-Route::get("/table", ReadTableController::class)->name("table");
+Route::get('/table', ReadTableController::class)
+    ->name('table')
+    ->middleware([RequiresSessionData::class]);

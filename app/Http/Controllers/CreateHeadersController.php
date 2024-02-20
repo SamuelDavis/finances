@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Header;
+use App\Rules\KeyIn;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
@@ -14,10 +15,13 @@ use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
 class CreateHeadersController extends Controller
 {
+    use InteractsWithSessionData;
+
     public function __invoke(ReadHeadersController $read): BaseResponse
     {
-        $data = Session::get('data');
+        $data = $this->getSessionData();
         $validator = Validator::make(Request::all(), [
+            'headers' => ['required', 'array', new KeyIn($data[0])],
             'headers.*' => ['required', 'distinct', new In(Header::names())],
         ])->setAttributeNames(
             array_reduce(
@@ -42,22 +46,30 @@ class CreateHeadersController extends Controller
             );
         }
 
-        Session::put(
-            'data',
-            $this->mapDataToHeaders($validator->getValue('headers'), $data),
-        );
+        $headers = $validator->getValue('headers');
+        assert(is_array($headers));
+        Session::put('data', $this->mapDataToHeaders($headers, $data));
 
         return redirect('table', BaseResponse::HTTP_SEE_OTHER);
     }
 
+    /**
+     * @param  string[]  $inputHeaders
+     * @param  string[][]  $data
+     * @return string[][]
+     */
     private function mapDataToHeaders(array $inputHeaders, array $data): array
     {
         $knownHeaders = Header::names();
         $givenHeaders = array_shift($data);
+        assert(! empty($givenHeaders));
         $ordered = [];
 
         foreach ($knownHeaders as $name) {
-            $ordered[] = array_search($inputHeaders[$name], $givenHeaders);
+            $header = array_search($name, $inputHeaders);
+            $index = array_search($header, $givenHeaders);
+            assert(is_int($index));
+            $ordered[] = $index;
         }
 
         $data = array_map(function (array $row) use ($ordered) {

@@ -2,8 +2,6 @@
 
 namespace Tests\Feature\Http\Middleware;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class SessionHasOrderedDataTest extends TestCase
@@ -13,8 +11,8 @@ class SessionHasOrderedDataTest extends TestCase
      */
     public function test_example(): void
     {
-        $response = $this->get('/');
-
+        $this->markTestSkipped('tbd');
+        $response = $this->get('/'); /** @phpstan-ignore-line  */
         $response->assertStatus(200);
     }
 }

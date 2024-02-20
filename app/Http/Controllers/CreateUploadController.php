@@ -33,6 +33,7 @@ class CreateUploadController extends Controller
         /** @var UploadedFile $file */
         $file = $validator->getValue('file');
         $stream = fopen($file->path(), 'r');
+        assert(is_resource($stream));
         $data = [];
         while (($row = fgetcsv($stream)) !== false) {
             $data[] = $row;

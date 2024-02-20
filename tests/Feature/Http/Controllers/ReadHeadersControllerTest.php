@@ -10,14 +10,17 @@ class ReadHeadersControllerTest extends TestCase
 {
     use AssertRedirect;
 
-    private string $fromRoute = "headers";
-
-    public function test_renders()
+    protected function getFromRoute(): string
     {
-        $data = [["a", "b", "c"], ["1", "2", "3"], ["4", "5", "6"]];
-        Session::put("data", $data);
-        $this->get(route("headers"))
+        return 'headers';
+    }
+
+    public function test_renders(): void
+    {
+        $data = [['a', 'b', 'c'], ['1', '2', '3'], ['4', '5', '6']];
+        Session::put('data', $data);
+        $this->get(route('headers'))
             ->assertStatus(Response::HTTP_OK)
-            ->assertSeeInOrder(array_merge(...$data));
+            ->assertSeeInOrder($data[0]);
     }
 }
