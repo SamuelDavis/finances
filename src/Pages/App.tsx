@@ -1,4 +1,4 @@
-import { For, Show, createEffect, createSignal } from "solid-js";
+import { Accessor, For, Show, createEffect, createSignal } from "solid-js";
 
 export type Targeted<
   Ev extends Event,
@@ -25,10 +25,12 @@ export default function App() {
   const [getSavings, setSavings] = createPersistentSignal({
     key: "savings",
     reviver: 0,
+    equals: false,
   });
   const [getWorryAt, setWorryAt] = createPersistentSignal({
     key: "worryAt",
     reviver: 0,
+    equals: false,
   });
 
   const getAnnualTotal = (): number => {
@@ -39,32 +41,23 @@ export default function App() {
         : acc + source.amount * (WeeksPerYear / source.interval);
     }, 0);
   };
-  const getWorryIn = (): number => {
+  const getWorryIn = (): undefined | number => {
     const annualTotal = getAnnualTotal();
     const savings = getSavings();
     const worryAt = getWorryAt();
     const worryMin = savings - worryAt;
 
-    console.debug({
-      annualTotal,
-      savings,
-      worryAt,
-      worryMin,
-      foo: worryMin + annualTotal,
-      bar: worryMin / Math.abs(annualTotal),
-    });
-
-    if (annualTotal > 0) return 0;
+    if (annualTotal > 0) return undefined;
     if (worryMin + annualTotal < worryAt) return -1;
     return worryMin / Math.abs(annualTotal);
   };
-  const getNoSavingsIn = (): number => {
+  const getNoSavingsIn = (): undefined | number => {
     const savings = getSavings();
     const worryAt = getWorryAt();
     const annualTotal = getAnnualTotal();
     const worryMin = Math.min(savings, worryAt);
 
-    if (annualTotal > 0) return 0;
+    if (annualTotal > 0) return undefined;
     return worryMin / Math.abs(annualTotal);
   };
 
@@ -88,10 +81,10 @@ export default function App() {
   }
 
   function onUpdateSavings(event: Targeted<InputEvent>) {
-    setSavings(event.currentTarget.valueAsNumber);
+    setSavings(event.currentTarget.valueAsNumber || 0);
   }
   function onUpdateWorryAt(event: Targeted<InputEvent>) {
-    setWorryAt(event.currentTarget.valueAsNumber);
+    setWorryAt(event.currentTarget.valueAsNumber || 0);
   }
 
   return (
@@ -207,9 +200,7 @@ export default function App() {
                 <td>Worry in</td>
                 <td>
                   <output>
-                    <Show when={getWorryIn()} fallback="no">
-                      {(get) => (get() === -1 ? "now" : <Num value={get()} />)}
-                    </Show>
+                    <Deadline value={getWorryIn()} />
                   </output>
                 </td>
                 <td>Years</td>
@@ -218,9 +209,7 @@ export default function App() {
                 <td>No savings in</td>
                 <td>
                   <output>
-                    <Show when={getNoSavingsIn()} fallback="no">
-                      {(get) => (get() === -1 ? "now" : <Num value={get()} />)}
-                    </Show>
+                    <Deadline value={getNoSavingsIn()} />
                   </output>
                 </td>
                 <td>Years</td>
@@ -262,4 +251,10 @@ function Num(props: { value: number; money?: true }) {
       })}
     </span>
   );
+}
+
+function Deadline(props: { value: undefined | number }) {
+  if (props.value === undefined) return "no";
+  if (props.value === -1) return "now";
+  return <Num value={props.value} />;
 }
