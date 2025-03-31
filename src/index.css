@@ -1,0 +1,8 @@
+[aria-label="group"] {
+  display: flex;
+  gap: 1em;
+}
+
+[aria-label="group"] > * {
+  flex: 1 1;
+}

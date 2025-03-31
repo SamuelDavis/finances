@@ -1,5 +1,6 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
+import "@picocss/pico/css/pico.classless.css";
 import "./index.css";
 import App from "./Pages/App";
 import Layout from "./Pages/Layout";
