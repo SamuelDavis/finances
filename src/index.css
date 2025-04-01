@@ -1,8 +1,16 @@
 [aria-label="group"] {
   display: flex;
+  flex-wrap: wrap;
   gap: 1em;
 }
 
 [aria-label="group"] > * {
   flex: 1 1;
+}
+[aria-label^="$"]::before {
+  content: "$";
+}
+
+td:not(:first-child) {
+  text-align: right;
 }
